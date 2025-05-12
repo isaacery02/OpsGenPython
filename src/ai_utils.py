@@ -89,9 +89,10 @@ The thrid paragraph should cover:
 Please note:
 - Avoid generic statements and focus on specific observations based on the provided data.
 - Important: DO NOT USE unclear language that makes you seem unclear, like "it appears" or "it seems" or "may be" or "from what I can see". Be direct and factual.
-- Do not use language that expresses any uncertaintly, like "potentially this" or "possibly that"
+- Do not use language that expresses any uncertaintly, like "potentially this" or "possibly that" or "suggesting" or "could be".
 - Use technical language appropriate for an Azure expert audience.
 - Synthesize the information into a coherent analysis.
+- Dont say "your environment" or "your resources" or "your data". Use "the environment" or "the resources" or "the data".
 - If the provided data is sparse, make the analysis concise and factual based on what's available.
 - Avoid making generic recommendations unless they are direct, factual observations (e.g., "No geo-redundant storage was observed in this category based on the SKUs.").
 - Attempt to make the analysis sound as though the architect is describing the environment to a customer, rather than just listing facts or observations.

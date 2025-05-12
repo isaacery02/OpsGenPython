@@ -1,5 +1,5 @@
 {
-  "Virtual Machines": {
+   "Virtual Machines": {
     "query": "resources\n| where type in~ ('microsoft.compute/virtualmachines')\n| project name, location, type, resourceGroup, tags, zones,\n            vmId = properties.vmId, \n            vmSize = properties.hardwareProfile.vmSize, \n            osType = properties.storageProfile.osDisk.osType,\n            osDetails = properties.extended.instanceView.osName,\n            osVersion = properties.extended.instanceView.osVersion,\n            vmProvisioningState = properties.provisioningState,\n            linuxPatchSettings = properties.osProfile.linuxConfiguration.patchSettings.assessmentMode,\n            windowsPatchSettings = properties.osProfile.windowsConfiguration.patchSettings.assessmentMode,\n            dataDiskCount = iff(type =~ 'microsoft.compute/virtualmachines', array_length(properties.storageProfile.dataDisks), 0),\n            managedIdentityType = identity.type\n| order by type asc, name asc",
     "fields_for_ai": [
       "name", "location", "type", "resourceGroup", "tags", "zones",
@@ -8,6 +8,104 @@
     ],
     "fields_for_table": [
       "name", "location", "resourceGroup", "vmSize", "osType", "osDetails", "vmProvisioningState"
+    ]
+  },
+ "App Platform & Containers": {
+    "query": "Resources\n| where type in~ ('microsoft.web/sites', 'microsoft.web/serverfarms', 'microsoft.containerservice/managedclusters', 'microsoft.containerinstance/containergroups', 'microsoft.app/containerapps')\n| project name, location, type, kind, tags,\n            managedIdentityType = identity.type,\n            appState = properties.state, \n            appHostName = iff(type=~'microsoft.web/sites' and isnotnull(properties.hostNames) and array_length(properties.hostNames) > 0, properties.hostNames[0], ''),\n            runtimeName = iff(type=~'microsoft.web/sites', properties.siteConfig.linuxFxVersion, properties.siteConfig.windowsFxVersion), \n            httpsOnly = properties.httpsOnly,\n            clientAffinityEnabled = properties.clientAffinityEnabled, \n            appPublicNetworkAccess = properties.publicNetworkAccess,\n            vnetSubnetId = properties.virtualNetworkSubnetId,\n            aspTier = sku.tier, \n            aspSkuName = sku.name, \n            aspFamily = sku.family, \n            aspCapacity = sku.capacity,\n            aspStatus = properties.status,\n            aspNumberOfSites = properties.numberOfSites,\n            appServicePlanId = properties.serverFarmId, \n            kubernetesVersion = properties.kubernetesVersion,\n            aksFqdn = properties.fqdn,\n            aksPowerState = properties.powerState.code,\n            aksNetworkPlugin = properties.networkProfile.networkPlugin,\n            aksNetworkPolicy = properties.networkProfile.networkPolicy,\n            aksPrivateCluster = properties.apiServerAccessProfile.enablePrivateCluster,\n            aksNodePoolCount = array_length(properties.agentPoolProfiles),\n            aksAgentVmSize = iff(isnotnull(properties.agentPoolProfiles) and array_length(properties.agentPoolProfiles) > 0, properties.agentPoolProfiles[0]['vmSize'], ''),\n            aksAgentCount = iff(isnotnull(properties.agentPoolProfiles) and array_length(properties.agentPoolProfiles) > 0, properties.agentPoolProfiles[0]['count'], ''),\n            containerOsType = properties.osType,\n            containerImage = iff(isnotnull(properties.containers) and array_length(properties.containers) > 0, properties.containers[0]['image'], ''),\n            containerCount = array_length(properties.containers),\n            containerRestartPolicy = properties.restartPolicy,\n            containerIpType = properties.ipAddress.type,\n            acaProvisioningState = properties.provisioningState,\n            acaEnvironmentId = properties.environmentId,\n            acaLatestRevision = properties.latestRevisionName,\n            caMinReplicas = properties.template.scale.minReplicas,\n            caMaxReplicas = properties.template.scale.maxReplicas\n| order by type asc, name asc",
+    "fields_for_ai": [
+      "name", "location", "type", "kind", "tags", "managedIdentityType",
+      "appState", "appHostName", "runtimeName", "httpsOnly", "clientAffinityEnabled", "appPublicNetworkAccess", "vnetSubnetId",
+      "aspTier", "aspSkuName", "aspFamily", "aspCapacity", "aspStatus", "aspNumberOfSites", "appServicePlanId",
+      "kubernetesVersion", "aksFqdn", "aksPowerState", "aksNetworkPlugin", "aksNetworkPolicy", "aksPrivateCluster", "aksNodePoolCount", "aksAgentVmSize", "aksAgentCount",
+      "containerOsType", "containerImage", "containerCount", "containerRestartPolicy", "containerIpType",
+      "acaProvisioningState", "acaEnvironmentId", "acaLatestRevision", "caMinReplicas", "caMaxReplicas"
+    ],
+    "fields_for_table": [
+      "name", "location", "type", "kind", "appState", "aspTier", "aspSkuName", "kubernetesVersion", "containerImage"
+    ]
+  },
+  "Storage Solutions": {
+    "query": "Resources\n| where type in~ ('microsoft.storage/storageaccounts')\n| project name, location, type, kind, tags,\n            storageSkuName = sku.name, \n            storageSkuTier = sku.tier,\n            accessTier = properties.accessTier, \n            provisioningState = properties.provisioningState,\n            primaryLocation = properties.primaryLocation,\n            secondaryLocation = properties.secondaryLocation,\n            primaryBlobEndpoint = properties.primaryEndpoints.blob,\n            supportsHttpsTrafficOnly = properties.supportsHttpsTrafficOnly, \n            allowBlobPublicAccess = properties.allowBlobPublicAccess,\n            minimumTlsVersion = properties.minimumTlsVersion,\n            networkDefaultAction = properties.networkAcls.defaultAction,\n            allowSharedKeyAccess = properties.allowSharedKeyAccess,\n            isHnsEnabled = properties.isHnsEnabled, \n            creationTime = properties.creationTime\n| order by type asc, name asc",
+    "fields_for_ai": [
+      "name", "location", "type", "kind", "tags",
+      "storageSkuName", "storageSkuTier", "accessTier", "provisioningState", "primaryLocation", "secondaryLocation", "primaryBlobEndpoint",
+      "supportsHttpsTrafficOnly", "allowBlobPublicAccess", "minimumTlsVersion", "networkDefaultAction", "allowSharedKey", "isHnsEnabled", "creationTime"
+    ],
+    "fields_for_table": [
+      "name", "location", "kind", "storageSkuName", "storageSkuTier", "allowBlobPublicAccess", "isHnsEnabled", "provisioningState"
+    ]
+  },
+  "Networking & Connectivity": {
+    "query": "Resources\n| where type in~ ('microsoft.network/virtualnetworks', 'microsoft.network/loadbalancers', 'microsoft.network/applicationgateways', 'microsoft.network/azurefirewalls', 'microsoft.network/virtualnetworkgateways', 'microsoft.network/dnszones', 'microsoft.network/networksecuritygroups', 'microsoft.network/routetables', 'microsoft.network/privateendpoints', 'microsoft.network/publicipaddresses')\n| project name, location, type, kind, tags,\n            provisioningState = properties.provisioningState,\n            vnetAddressPrefixes = properties.addressSpace.addressPrefixes, \n            vnetSubnetCount = array_length(properties.subnets),\n            dnsServers = properties.dhcpOptions.dnsServers,\n            ddosProtectionEnabled = properties.enableDdosProtection,\n            lbSku = sku.name, \n            lbType = properties.loadBalancerType, // For LB, though 'type' field also shows it\n            lbFrontendIpCount = array_length(properties.frontendIPConfigurations),\n            appGwSku = sku.name, \n            appGwTier = sku.tier, \n            appGwOperationalState = properties.operationalState,\n            appGwHttp2Enabled = properties.enableHttp2,\n            appGwWafMode = properties.firewallConfiguration.firewallMode,\n            firewallTier = sku.tier, \n            firewallThreatIntelMode = properties.threatIntelMode,\n            gatewayType = properties.gatewayType, \n            vpnType = properties.vpnType, \n            gatewaySku = sku.name, \n            gatewayActiveActive = properties.activeActive,\n            gatewayEnableBgp = properties.enableBgp,\n            dnsZoneType = properties.zoneType,\n            dnsRecordSetCount = properties.numberOfRecordSets,\n            nsgRuleCount = array_length(properties.defaultSecurityRules) + array_length(properties.securityRules),\n            routeTableRouteCount = array_length(properties.routes),\n            disableBgpRoutePropagation = properties.disableBgpRoutePropagation,\n            privateEndpointSubnetId = properties.subnet.id,\n            privateLinkServiceId = iff(isnotnull(properties.privateLinkServiceConnections) and array_length(properties.privateLinkServiceConnections) > 0, properties.privateLinkServiceConnections[0].properties.privateLinkServiceId, ''),\n            publicIpAddress = properties.ipAddress, // For Public IP Addresses\n            publicIpAllocationMethod = properties.publicIPAllocationMethod, // For Public IP Addresses\n            publicIpSku = sku.name // For Public IP Addresses\n| order by type asc, name asc",
+    "fields_for_ai": [
+      "name", "location", "type", "kind", "tags", "provisioningState",
+      "vnetAddressPrefixes", "vnetSubnetCount", "dnsServers", "ddosProtectionEnabled",
+      "lbSku", "lbType", "lbFrontendIpCount",
+      "appGwSku", "appGwTier", "appGwOperationalState", "appGwHttp2Enabled", "appGwWafMode",
+      "firewallTier", "firewallThreatIntelMode",
+      "gatewayType", "vpnType", "gatewaySku", "gatewayActiveActive", "gatewayEnableBgp",
+      "dnsZoneType", "dnsRecordSetCount",
+      "nsgRuleCount",
+      "routeTableRouteCount", "disableBgpRoutePropagation",
+      "privateEndpointSubnetId", "privateLinkServiceId",
+      "publicIpAddress", "publicIpAllocationMethod", "publicIpSku"
+    ],
+    "fields_for_table": [
+      "name", "location", "type", "kind", "provisioningState", "vnetAddressPrefixes", "lbSku", "appGwSku", "firewallTier", "gatewayType", "dnsZoneType", "publicIpAddress"
+    ]
+  },
+  "Database Services": {
+    "query": "Resources\n| where type in~ ('microsoft.sql/servers/databases', 'microsoft.documentdb/databaseaccounts', 'microsoft.dbforpostgresql/flexibleservers', 'microsoft.dbformysql/flexibleservers', 'microsoft.cache/redis')\n| project name, location, type, kind, tags,\n            status = properties.status, \n            provisioningState = properties.provisioningState, \n            sqlSkuName = sku.name, \n            sqlTier = sku.tier,\n            sqlFamily = sku.family, \n            sqlCapacity = sku.capacity, \n            collation = properties.collation,\n            currentServiceObjectiveName = properties.currentServiceObjectiveName, \n            requestedServiceObjectiveName = properties.requestedServiceObjectiveName,\n            maxSizeBytes = properties.maxSizeBytes,\n            cosmosOfferType = properties.databaseAccountOfferType, \n            cosmosReadLocationsCount = array_length(properties.readLocations), \n            cosmosWriteLocationsCount = array_length(properties.writeLocations),\n            cosmosPublicNetworkAccess = properties.publicNetworkAccess,\n            cosmosConsistencyLevel = properties.consistencyPolicy.defaultConsistencyLevel,\n            dbServerState = properties.state, \n            dbVersion = properties.version,\n            dbComputeSkuName = sku.name, \n            dbComputeTier = sku.tier, \n            dbStorageSizeGB = properties.storage.storageSizeGB,\n            dbIops = properties.storage.iops,\n            dbStorageAutogrow = properties.storage.autoGrow, \n            dbHighAvailability = properties.highAvailability.mode,\n            dbAvailabilityZone = properties.availabilityZone, \n            dbBackupRetentionDays = properties.backup.backupRetentionDays,\n            dbBackupGeoRedundant = properties.backup.geoRedundantBackup,\n            dbPublicNetworkAccess = properties.network.publicNetworkAccess,\n            redisSkuFamily = sku.family, \n            redisSkuName = sku.name,\n            redisCapacity = sku.capacity, \n            redisVersion = properties.redisVersion,\n            redisEnableNonSslPort = properties.enableNonSslPort,\n            redisPublicNetworkAccess = properties.publicNetworkAccess,\n            redisShardCount = properties.shardCount\n| order by type asc, name asc",
+    "fields_for_ai": [
+      "name", "location", "type", "kind", "tags", "status", "provisioningState",
+      "sqlSkuName", "sqlTier", "sqlFamily", "sqlCapacity", "collation", "currentServiceObjectiveName", "requestedServiceObjectiveName", "maxSizeBytes",
+      "cosmosOfferType", "cosmosReadLocationsCount", "cosmosWriteLocationsCount", "cosmosPublicNetworkAccess", "cosmosConsistencyLevel",
+      "dbServerState", "dbVersion", "dbComputeSkuName", "dbComputeTier", "dbStorageSizeGB", "dbIops", "dbStorageAutogrow", "dbHighAvailability", "dbAvailabilityZone", "dbBackupRetentionDays", "dbBackupGeoRedundant", "dbPublicNetworkAccess",
+      "redisSkuFamily", "redisSkuName", "redisCapacity", "redisVersion", "redisEnableNonSslPort", "redisPublicNetworkAccess", "redisShardCount"
+    ],
+    "fields_for_table": [
+      "name", "location", "type", "kind", "status", "sqlTier", "dbComputeTier", "redisSkuName", "cosmosConsistencyLevel", "dbHighAvailability"
+    ]
+  },
+  "Analytics & AI/ML Platforms": {
+    "query": "Resources\n| where type in~ ('microsoft.synapse/workspaces', 'microsoft.datafactory/factories', 'microsoft.databricks/workspaces', 'microsoft.machinelearningservices/workspaces', 'microsoft.cognitiveservices/accounts')\n| project name, location, type, kind, tags,\n            provisioningState = properties.provisioningState,\n            managedIdentityType = iff(isnotnull(identity), identity.type, ''),\n            publicNetworkAccess = properties.publicNetworkAccess,\n            synapseSqlAdminLogin = properties.sqlAdministratorLogin,\n            synapseDefaultDataLake = iff(isnotnull(properties.defaultDataLakesStorage), properties.defaultDataLakeStorage.accountUrl, ''),\n            adfVersion = properties.version,\n            databricksSku = sku.name,\n            databricksEnableNoPublicIp = iff(isnotnull(properties.parameters) and isnotnull(properties.parameters.enableNoPublicIp), properties.parameters.enableNoPublicIp, null),\n            amlHbiWorkspace = properties.hbiWorkspace,\n            amlDiscoveryUrl = properties.discoveryUrl,\n            csSkuName = sku.name,\n            csApiKind = properties.kind, \n            csCustomSubDomain = properties.customSubDomainName,\n            csEndpoints = properties.endpoints \n| order by type asc, name asc",
+    "fields_for_ai": [ 
+      "name", "location", "type", "kind", "tags", "provisioningState", "managedIdentityType", "publicNetworkAccess",
+      "synapseSqlAdminLogin", "synapseDefaultDataLake",
+      "adfVersion",
+      "databricksSku", "databricksEnableNoPublicIp",
+      "amlHbiWorkspace", "amlDiscoveryUrl",
+      "csSkuName", "csApiKind", "csCustomSubDomain", "csEndpoints"
+    ],
+    "fields_for_table": [ 
+      "name", "location", "type", "kind", "provisioningState", "publicNetworkAccess", "databricksSku", "csSkuName", "csApiKind"
+    ]
+  },
+  "Identity & Security Posture": {
+    "query": "Resources\n| where type in~ ('microsoft.keyvault/vaults', 'microsoft.security/pricings', 'microsoft.insights/activitylogalerts', 'microsoft.insights/metricalerts', 'microsoft.authorization/policyassignments')\n| project name, location, type, kind, tags,\n            keyVaultSkuName = sku.name,\n            keyVaultSkuFamily = sku.family,\n            keyVaultTenantId = properties.tenantId,\n            keyVaultEnableRbac = properties.enableRbacAuthorization,\n            keyVaultPublicNetworkAccess = properties.publicNetworkAccess,\n            keyVaultSoftDelete = properties.enableSoftDelete,\n            keyVaultPurgeProtection = properties.enablePurgeProtection,\n            defenderPlanName = name, // For pricings, name is the plan type\n            defenderPlanTier = properties.pricingTier,\n            defenderSubPlan = properties.subPlan,\n            alertEnabled = properties.enabled, \n            alertDescription = properties.description, \n            alertCondition = properties.condition, // For metric alerts, this is complex\n            activityLogAlertCriteria = properties.criteria, // For activity log alerts, complex\n            policyAssignmentId = properties.policyDefinitionId,\n            policyDisplayName = properties.displayName, \n            policyScope = properties.scope,\n            policyEffect = iff(isnotnull(properties.parameters) and isnotnull(properties.parameters.effect), properties.parameters.effect.value, properties.policyDefinition.properties.policyRule.then.effect) // Try to get effect from parameters or definition\n| order by type asc, name asc",
+    "fields_for_ai": [
+      "name", "location", "type", "kind", "tags",
+      "keyVaultSkuName", "keyVaultSkuFamily", "keyVaultTenantId", "keyVaultEnableRbac", "keyVaultPublicNetworkAccess", "keyVaultSoftDelete", "keyVaultPurgeProtection",
+      "defenderPlanName", "defenderPlanTier", "defenderSubPlan",
+      "alertEnabled", "alertDescription", "alertCondition", "activityLogAlertCriteria",
+      "policyAssignmentId", "policyDisplayName", "policyScope", "policyEffect"
+    ],
+    "fields_for_table": [
+      "name", "location", "type", "kind", "keyVaultSkuName", "defenderPlanTier", "alertEnabled", "policyDisplayName"
+    ]
+  },
+  "Management & Governance": {
+    "query": "Resources\n| where type in~ ('microsoft.operationalinsights/workspaces', 'microsoft.insights/components', 'microsoft.automation/automationaccounts', 'microsoft.recoveryservices/vaults')\n| project name, location, type, kind, tags,\n            provisioningState = properties.provisioningState,\n            managedIdentityType = identity.type,\n            publicNetworkAccessLAIngestion = properties.publicNetworkAccessForIngestion, \n            publicNetworkAccessLAQuery = properties.publicNetworkAccessForQuery, \n            logRetentionInDays = properties.retentionInDays, \n            logSkuName = sku.name,\n            logDailyQuotaGb = properties.workspaceCapping.dailyQuotaGb,\n            appInsightsWorkspaceId = properties.WorkspaceResourceId, \n            appInsightsType = properties.Application_Type,\n            appInsightsIngestionMode = properties.IngestionMode,\n            appInsightsInstrumentationKey = properties.InstrumentationKey, \n            automationSkuName = sku.name,\n            backupVaultSkuName = sku.name, \n            backupVaultSkuTier = sku.tier, \n            backupStorageRedundancy = properties.backupProperties.backupStorageRedundancy, \n            rsvMonitoringSettings = properties.monitoringSettings, // For Recovery Services Vault\n            rsvUpgradeDetails = properties.upgradeDetails // For Recovery Services Vault\n| order by type asc, name asc",
+    "fields_for_ai": [
+      "name", "location", "type", "kind", "tags", "provisioningState", "managedIdentityType", 
+      "publicNetworkAccessLAIngestion", "publicNetworkAccessLAQuery",
+      "logRetentionInDays", "logSkuName", "logDailyQuotaGb",
+      "appInsightsWorkspaceId", "appInsightsType", "appInsightsIngestionMode", "appInsightsInstrumentationKey",
+      "automationSkuName",
+      "backupVaultSkuName", "backupVaultSkuTier", "backupStorageRedundancy", "rsvMonitoringSettings", "rsvUpgradeDetails"
+    ],
+    "fields_for_table": [
+      "name", "location", "type", "kind", "provisioningState", "logSkuName", "appInsightsType", "automationSkuName", "backupVaultSkuName"
     ]
   }
 }

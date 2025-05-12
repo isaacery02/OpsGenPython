@@ -1,6 +1,6 @@
 Virtual Machines
-Storage Accounts
 App Platform & Containers
+Storage Accounts
 Storage Solutions
 Networking & Connectivity
 Database Services
