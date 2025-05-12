@@ -68,7 +68,7 @@ def get_gemini_summary(category_name, resource_data_str, gemini_api_key):
         # Configure the API key each time - harmless and ensures it's set
         genai.configure(api_key=gemini_api_key)
         # Consider making the model name configurable if needed
-        model = genai.GenerativeModel('gemini-pro') 
+        model = genai.GenerativeModel('gemini-2.5-pro-latest') 
 
         # --- The Detailed Prompt (Keep as defined previously) ---    
         prompt = f"""You are an expert Azure Solutions Architect tasked with providing a detailed analysis for a customer report.
@@ -89,6 +89,7 @@ The thrid paragraph should cover:
 Please note:
 - Avoid generic statements and focus on specific observations based on the provided data.
 - Important: DO NOT USE unclear language that makes you seem unclear, like "it appears" or "it seems" or "may be" or "from what I can see". Be direct and factual.
+- Do not use language that expresses any uncertaintly, like "potentially this" or "possibly that"
 - Use technical language appropriate for an Azure expert audience.
 - Synthesize the information into a coherent analysis.
 - If the provided data is sparse, make the analysis concise and factual based on what's available.
