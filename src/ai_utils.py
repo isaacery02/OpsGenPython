@@ -42,8 +42,15 @@ def format_resources_for_ai(resources, fields_to_extract):
             # If no specific fields were requested or none had values
             formatted_list.append(f"- Name: {name}, Type: {res_type} (No specific details extracted based on fields_for_ai config)")
 
-    return "
-".join(formatted_list) if formatted_list else "No relevant details extracted for resources in this category based on fields_for_ai."
+    # Rewritten again for clarity
+    if formatted_list:
+        result_string = "
+".join(formatted_list)
+    else:
+        # Carefully rewritten Line 45
+        result_string = "No relevant details extracted for resources in this category based on fields_for_ai."
+    # Line 46
+    return result_string
 
 def get_gemini_summary(category_name, resource_data_str, gemini_api_key):
     """Gets a summary from Gemini AI using the detailed prompt."""

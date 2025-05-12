@@ -117,11 +117,9 @@ def main():
 
     # --- Generate Report --- 
     if not categories_to_process:
-         print("
-Skipping report generation as no categories were processed.") # Corrected this line
+         print("\nSkipping report generation as no categories were processed.") # Corrected this line
     else:
-        print("
-All selected categories processed. Generating Markdown report...")
+        print("\nAll selected categories processed. Generating Markdown report...")
         markdown_output = report_generator.generate_markdown_report(
             all_category_data, 
             azure_categories_config, # Pass the full category config for table headers
@@ -155,8 +153,7 @@ All selected categories processed. Generating Markdown report...")
 
     # --- Finalize ---
     end_time = datetime.datetime.now(datetime.timezone.utc)
-    print(f"
-Azure Environment Summarization Tool finished at {end_time.strftime('%Y-%m-%d %H:%M:%S %Z')}.")
+    print(f"\nAzure Environment Summarization Tool finished at {end_time.strftime('%Y-%m-%d %H:%M:%S %Z')}.")
     print(f"Total execution time: {end_time - start_time}")
 
 if __name__ == "__main__":
