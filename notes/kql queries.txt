@@ -1,0 +1,16 @@
+//Compute infrastructure
+
+resources
+| where type in~ ('microsoft.compute/virtualmachines')
+| project name, location, type, resourceGroup, tags,zones,
+            vmId = properties.vmId, 
+            vmSize = properties.hardwareProfile.vmSize, 
+            osType = properties.storageProfile.osDisk.osType,
+            osDetails= properties.extended.instanceView.osName,
+            osVersion = properties.extended.instanceView.osVersion,
+            vmProvisioningState = properties.provisioningState,
+            linuxPatchSettings=properties.osProfile.linuxConfiguration.patchSettings.assessmentMode,
+            windowsPatchSettings=properties.osProfile.windowsConfiguration.patchSettings.assessmentMode,
+            dataDiskCount = iff(type =~ 'microsoft.compute/virtualmachines', array_length(properties.storageProfile.dataDisks), 0),
+            managedIdentityType = identity.type
+| order by type asc, name asc

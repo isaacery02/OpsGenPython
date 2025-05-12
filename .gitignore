@@ -1,0 +1,64 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environment-specific files
+.env
+.venv
+env/
+venv/
+ENV
+env.bak/
+venv.bak/
+
+# Package distribution / log files
+dist/
+build/
+sdist/
+*.egg-info/
+*.egg
+.pytest_cache/
+*.log
+*.out
+
+# Editors / IDEs
+.idea/
+.project
+.classpath
+.settings/
+*.sublime-project
+*.sublime-workspace
+.vscode/
+*.swp
+*.swo
+*.kate-backup
+*.netbeans/
+
+# OS or system files
+.DS_Store
+Thumbs.db
+
+# Jupyter Notebook related files
+.ipynb_checkpoints/
+
+# Python specific temporary files
+__pypackages__/
+
+# MyPy cache
+.mypy_cache/
+
+# Optional: If you're using pyinstaller
+*.spec
+build
+
+# Optional: If you're using a specific testing framework's cache
+.coverage
+htmlcov/
+
+# Optional: If you're using a specific linter/formatter's cache
+.ruff_cache/
+.pylintrc.d/
+.pdm-build/
+
+config.json

@@ -1,0 +1,13 @@
+{
+  "Virtual Machine Details": {
+    "query": "resources\n| where type in~ ('microsoft.compute/virtualmachines')\n| project name, location, type, resourceGroup, tags, zones,\n            vmId = properties.vmId, \n            vmSize = properties.hardwareProfile.vmSize, \n            osType = properties.storageProfile.osDisk.osType,\n            osDetails = properties.extended.instanceView.osName,\n            osVersion = properties.extended.instanceView.osVersion,\n            vmProvisioningState = properties.provisioningState,\n            linuxPatchSettings = properties.osProfile.linuxConfiguration.patchSettings.assessmentMode,\n            windowsPatchSettings = properties.osProfile.windowsConfiguration.patchSettings.assessmentMode,\n            dataDiskCount = iff(type =~ 'microsoft.compute/virtualmachines', array_length(properties.storageProfile.dataDisks), 0),\n            managedIdentityType = identity.type\n| order by type asc, name asc",
+    "fields_for_ai": [
+      "name", "location", "type", "resourceGroup", "tags", "zones",
+      "vmId", "vmSize", "osType", "osDetails", "osVersion", "vmProvisioningState",
+      "linuxPatchSettings", "windowsPatchSettings", "dataDiskCount", "managedIdentityType"
+    ],
+    "fields_for_table": [
+      "name", "location", "type", "resourceGroup", "vmSize", "osType", "osDetails", "vmProvisioningState"
+    ]
+  }
+}
