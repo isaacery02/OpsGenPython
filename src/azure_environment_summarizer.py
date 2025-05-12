@@ -67,8 +67,7 @@ def main():
 
     # --- Process each selected category --- 
     for category_name in categories_to_process:
-        print(f"
-Processing Category: {category_name}") # Corrected Line 70
+        print("\nProcessing Category: " + category_name)
         details = azure_categories_config.get(category_name, {}) # Get config for this specific category
         
         kql_query = details.get("query")
@@ -119,7 +118,7 @@ Processing Category: {category_name}") # Corrected Line 70
     # --- Generate Report --- 
     if not categories_to_process:
          print("
-Skipping report generation as no categories were processed.")
+Skipping report generation as no categories were processed.") # Corrected this line
     else:
         print("
 All selected categories processed. Generating Markdown report...")
