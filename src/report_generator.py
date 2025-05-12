@@ -14,18 +14,17 @@ def generate_markdown_report(all_category_data_dict, azure_categories_config, su
     if not subscription_id:
         subscription_id = "Unknown (Not Found in Config)"
         
-    # Corrected initial assignment for md_content (Line 14 approx)
+    # Corrected initial assignment and subsequent appends
     md_content = f"# Azure Environment Summary for Subscription: {subscription_id}
 
 "
-    
     md_content += f"_Report generated on: {datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%d %H:%M:%S %Z')}_
 
 "
-    # Using the simplified intro line from previous debugging
-    md_content += "Report Introduction.
+    # Restored original intro line, ensuring it's clean
+    md_content += "This report provides an AI-generated summary and a curated list of core resource details for Azure resources, grouped by common categories, based on data retrieved via Azure Resource Graph.
 
-" 
+"
 
     if not all_category_data_dict:
         md_content += "**No categories were processed or no data was generated.**

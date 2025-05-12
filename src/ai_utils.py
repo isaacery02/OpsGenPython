@@ -44,8 +44,7 @@ def format_resources_for_ai(resources, fields_to_extract):
 
     # Rewritten again for clarity
     if formatted_list:
-        result_string = "
-".join(formatted_list)
+        result_string = "\n".join(formatted_list)
     else:
         # Carefully rewritten Line 45
         result_string = "No relevant details extracted for resources in this category based on fields_for_ai."
@@ -64,8 +63,7 @@ def get_gemini_summary(category_name, resource_data_str, gemini_api_key):
         # Return the message indicating why AI wasn't called, but not as an error
         return resource_data_str 
         
-    print(f"
-Attempting to get detailed Gemini summary for: {category_name}...")
+    print(f"\nAttempting to get detailed Gemini summary for: {category_name}...")
     try:
         # Configure the API key each time - harmless and ensures it's set
         genai.configure(api_key=gemini_api_key)
@@ -135,8 +133,7 @@ In-depth Analysis:"""
         error_details = str(e)
         if hasattr(e, 'response') and e.response:
              try:
-                 error_details += f"
-Response Body: {e.response.text()}"
+                 error_details += f"Response Body: {e.response.text()}"
              except Exception:
                  error_details += " (Could not read error response body)"
         return f"Error generating summary for {category_name} due to API call failure: {error_details}"
