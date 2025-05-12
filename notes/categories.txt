@@ -1,0 +1,9 @@
+Virtual Machines
+Storage Accounts
+App Platform & Containers
+Storage Solutions
+Networking & Connectivity
+Database Services
+Analytics & AI/ML Platforms
+Identity & Security Posture
+Management & Governance
