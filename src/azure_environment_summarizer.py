@@ -68,7 +68,7 @@ def main():
     # --- Process each selected category --- 
     for category_name in categories_to_process:
         print(f"
-Processing Category: {category_name}...")
+Processing Category: {category_name}") # Corrected Line 70
         details = azure_categories_config.get(category_name, {}) # Get config for this specific category
         
         kql_query = details.get("query")
