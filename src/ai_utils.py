@@ -68,7 +68,7 @@ def get_gemini_summary(category_name, resource_data_str, gemini_api_key):
         # Configure the API key each time - harmless and ensures it's set
         genai.configure(api_key=gemini_api_key)
         # Consider making the model name configurable if needed
-        model = genai.GenerativeModel('gemini-2.5-pro-latest') 
+        model = genai.GenerativeModel('gemini-2.5-pro-preview-05-06') 
 
         # --- The Detailed Prompt (Keep as defined previously) ---    
         prompt = f"""You are an expert Azure Solutions Architect tasked with providing a detailed analysis for a customer report.
