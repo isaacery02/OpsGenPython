@@ -7,3 +7,10 @@ Database Services
 Analytics & AI/ML Platforms
 Identity & Security Posture
 Management & Governance
+
+
+Example:
+
+  "RUN_CATEGORIES": [
+        "App Platform & Containers"
+      ]
