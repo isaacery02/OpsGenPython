@@ -1,5 +1,4 @@
 //Compute infrastructure
-
 resources
 | where type in~ ('microsoft.compute/virtualmachines')
 | project name, location, type, resourceGroup, tags,zones,
@@ -13,4 +12,24 @@ resources
             windowsPatchSettings=properties.osProfile.windowsConfiguration.patchSettings.assessmentMode,
             dataDiskCount = iff(type =~ 'microsoft.compute/virtualmachines', array_length(properties.storageProfile.dataDisks), 0),
             managedIdentityType = identity.type
+| order by type asc, name asc
+
+
+// Analytics & AI/ML Platforms
+resources
+| where type in~ ('microsoft.synapse/workspaces', 'microsoft.datafactory/factories', 'microsoft.databricks/workspaces', 'microsoft.machinelearningservices/workspaces', 'microsoft.cognitiveservices/accounts')
+| project name, location, type, kind, tags,
+          provisioningState = properties.provisioningState,
+          managedIdentityType = iff(isnotnull(identity), identity.type, ''),
+          publicNetworkAccess = properties.publicNetworkAccess,
+          synapseSqlAdminLogin = properties.sqlAdministratorLogin,
+          synapseDefaultDataLake = iff(isnotnull(properties.defaultDataLakesStorage), properties.defaultDataLakeStorage.accountUrl, ''),
+          adfVersion = properties.version,
+          databricksSku = sku.name,
+          amlHbiWorkspace = properties.hbiWorkspace,
+          amlDiscoveryUrl = properties.discoveryUrl,
+          csSkuName = sku.name,
+          csApiKind = properties.kind,
+          csCustomSubDomain = properties.customSubDomainName,
+          csEndpoints = properties.endpoints
 | order by type asc, name asc
