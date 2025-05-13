@@ -2,6 +2,7 @@
 
 import json
 import google.generativeai as genai
+import os # Import os module
 
 # --- Terminal Colors ---
 class TerminalColors:
@@ -14,6 +15,24 @@ class TerminalColors:
     ENDC = '\033[0m'
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
+
+# --- Configuration Loading ---
+config = {}
+CONFIG_PATH = "src/config.json"
+GEMINI_MODEL = 'gemini-1.5-flash' # Default model
+
+try:
+    # Use standard file open as this code runs in a Python environment
+    with open(CONFIG_PATH, 'r') as f:
+        config = json.load(f)
+    GEMINI_MODEL = config.get('gemini_model', GEMINI_MODEL)
+    print(f"{TerminalColors.OKGREEN}Successfully loaded configuration from {CONFIG_PATH}. Using Gemini model: {GEMINI_MODEL}{TerminalColors.ENDC}")
+except FileNotFoundError:
+    print(f"{TerminalColors.WARNING}Configuration file not found at {CONFIG_PATH}. Using default Gemini model: {GEMINI_MODEL}{TerminalColors.ENDC}")
+except json.JSONDecodeError:
+    print(f"{TerminalColors.FAIL}Error decoding JSON from {CONFIG_PATH}. Using default Gemini model: {GEMINI_MODEL}{TerminalColors.ENDC}")
+except Exception as e:
+    print(f"{TerminalColors.FAIL}An unexpected error occurred while loading config: {e}. Using default Gemini model: {GEMINI_MODEL}{TerminalColors.ENDC}")
 
 def format_resources_for_ai(resources, fields_to_extract):
     """Formats a list of resource objects into a string for the AI prompt."""
@@ -73,10 +92,11 @@ async def get_gemini_summary(category_name, resource_data_str, gemini_api_key):
         print(f"{TerminalColors.OKCYAN}No data or no relevant details extracted to summarize for {category_name}. Skipping AI call.{TerminalColors.ENDC}")
         return resource_data_str 
         
-    print(f"{TerminalColors.OKBLUE}Attempting to get detailed Gemini summary for: {category_name}...{TerminalColors.ENDC}")
+    print(f"{TerminalColors.OKBLUE}Attempting to get detailed Gemini summary for: {category_name} using model {GEMINI_MODEL}...{TerminalColors.ENDC}")
     try:
         genai.configure(api_key=gemini_api_key)
-        model = genai.GenerativeModel('gemini-1.5-flash') 
+        # Use the globally loaded GEMINI_MODEL
+        model = genai.GenerativeModel(GEMINI_MODEL)
 
         prompt = f"""You are an expert Azure Solutions Architect tasked with providing a detailed analysis for a customer report.
 Based ONLY on the following list of Azure resources and their **detailed properties** for the '{category_name}' category, provide an in-depth analysis (aim for 3-5 paragraphs, or more if the complexity warrants).
@@ -160,10 +180,11 @@ async def generate_executive_summary(all_category_data_dict, gemini_api_key):
         print(f"{TerminalColors.WARNING}No valid category summaries available to generate an executive summary.{TerminalColors.ENDC}")
         return "An executive summary could not be generated as there were no detailed category summaries available."
 
-    print(f"{TerminalColors.OKBLUE}Attempting to generate Executive Summary from category summaries...{TerminalColors.ENDC}")
+    print(f"{TerminalColors.OKBLUE}Attempting to generate Executive Summary from category summaries using model {GEMINI_MODEL}...{TerminalColors.ENDC}")
     try:
         genai.configure(api_key=gemini_api_key)
-        model = genai.GenerativeModel('gemini-1.5-flash')
+        # Use the globally loaded GEMINI_MODEL
+        model = genai.GenerativeModel(GEMINI_MODEL)
 
         prompt = f"""You are an expert Azure Solutions Architect providing a high-level executive summary for a customer report.
 Based ONLY on the following *individual AI-generated category summaries* provided below, synthesize an overall executive summary of the Azure environment.
