@@ -21,7 +21,7 @@
       "acaProvisioningState", "acaEnvironmentId", "acaLatestRevision", "caMinReplicas", "caMaxReplicas"
     ],
     "fields_for_table": [
-      "name", "location", "type", "kind", "appState", "aspTier", "aspSkuName", "kubernetesVersion", "containerImage"
+      "name", "location", "type", "kind", "appState", "aspTier", "aspSkuName"
     ]
   },
   "Storage Solutions": {

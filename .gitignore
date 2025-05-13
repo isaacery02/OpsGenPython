@@ -62,3 +62,4 @@ htmlcov/
 .pdm-build/
 
 config.json
+OUTPUT/
