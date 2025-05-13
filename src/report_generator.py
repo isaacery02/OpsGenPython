@@ -5,6 +5,7 @@ import subprocess
 import datetime
 import json
 import shutil  # For shutil.which
+from src.ai_utils import generate_executive_summary # Import the new function
 
 # --- Terminal Colors ---
 class TerminalColors:
@@ -21,7 +22,7 @@ class TerminalColors:
 # Define default table fields here if needed as a fallback
 DEFAULT_TABLE_FIELDS = ["name", "location", "type", "resourceGroup"]
 
-def generate_markdown_report(all_category_data_dict, azure_categories_config, subscription_id):
+async def generate_markdown_report(all_category_data_dict, azure_categories_config, subscription_id, gemini_api_key):
     """Generates a markdown report from the summaries and includes resource tables."""
     if not subscription_id:
         subscription_id = "Unknown (Not Found in Config)"
@@ -33,10 +34,19 @@ def generate_markdown_report(all_category_data_dict, azure_categories_config, su
         "grouped by common categories, based on data retrieved via Azure Resource Graph.\n\n"
     )
 
+    # --- Generate and Add Executive Summary ---
+    # Check if there is data to process before calling for executive summary
     if not all_category_data_dict:
-        md_content += "**No categories were processed or no data was generated.**\n"
-        return md_content
+        md_content += "**No categories were processed or no data was generated. Executive Summary cannot be created.**\n\n"
+        return md_content  # Return early if no data at all
+    
+    executive_summary_text = await generate_executive_summary(all_category_data_dict, gemini_api_key)
+    md_content += "## Executive Summary\n\n"
+    md_content += f"{executive_summary_text}\n\n"
+    md_content += "---\n\n"  # Add a separator after the executive summary
+    # --- End Executive Summary ---
 
+    # Process each category
     for category_name, category_data in all_category_data_dict.items():
         summary_text = category_data.get("summary", "No AI summary available for this category.")
         resources = category_data.get("resources", [])
@@ -93,7 +103,7 @@ def generate_markdown_report(all_category_data_dict, azure_categories_config, su
             "No resources found",
             "No relevant details extracted"
         ]):
-            md_content += "_No specific resource details to list for this category (query might have returned empty)._"
+            md_content += "_No specific resource details to list for this category (query might have returned empty)._\n\n"
 
         md_content += "\n---\n\n"
 

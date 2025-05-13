@@ -63,3 +63,4 @@ htmlcov/
 
 config.json
 OUTPUT/
+.idx/
