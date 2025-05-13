@@ -3,6 +3,18 @@
 import json
 import google.generativeai as genai
 
+# --- Terminal Colors ---
+class TerminalColors:
+    HEADER = '\\033[95m'
+    OKBLUE = '\\033[94m'
+    OKCYAN = '\\033[96m'
+    OKGREEN = '\\033[92m'
+    WARNING = '\\033[93m'
+    FAIL = '\\033[91m'
+    ENDC = '\\033[0m'
+    BOLD = '\\033[1m'
+    UNDERLINE = '\\033[4m'
+
 def format_resources_for_ai(resources, fields_to_extract):
     """Formats a list of resource objects into a string for the AI prompt."""
     if not resources:
@@ -12,12 +24,12 @@ def format_resources_for_ai(resources, fields_to_extract):
     for res_idx, res in enumerate(resources):
         details = []
         if not isinstance(res, dict):
-            print(f"Warning: Resource item {res_idx} is not a dictionary: {res}")
+            print(f"{TerminalColors.WARNING}Warning: Resource item {res_idx} is not a dictionary: {res}{TerminalColors.ENDC}")
             continue
         
         # Ensure fields_to_extract is a list
         if not isinstance(fields_to_extract, list):
-            print(f"Warning: 'fields_for_ai' for this category is not a list. Cannot extract specific fields for AI prompt.")
+            print(f"{TerminalColors.WARNING}Warning: 'fields_for_ai' for this category is not a list. Cannot extract specific fields for AI prompt.{TerminalColors.ENDC}")
             # Attempt to use all keys as a fallback, though this might be noisy
             fields_to_extract = list(res.keys()) 
 
@@ -44,7 +56,7 @@ def format_resources_for_ai(resources, fields_to_extract):
 
     # Rewritten again for clarity
     if formatted_list:
-        result_string = "\n".join(formatted_list)
+        result_string = "".join(formatted_list)
     else:
         # Carefully rewritten Line 45
         result_string = "No relevant details extracted for resources in this category based on fields_for_ai."
@@ -54,16 +66,16 @@ def format_resources_for_ai(resources, fields_to_extract):
 def get_gemini_summary(category_name, resource_data_str, gemini_api_key):
     """Gets a summary from Gemini AI using the detailed prompt."""
     if not gemini_api_key:
-        print("Error: GEMINI_API_KEY not available. Skipping AI summary.")
+        print(f"{TerminalColors.FAIL}Error: GEMINI_API_KEY not available. Skipping AI summary.{TerminalColors.ENDC}")
         return "Error: GEMINI_API_KEY not configured properly."
     
     # Handle cases where no data should be sent to the AI
     if not resource_data_str or resource_data_str.startswith("No resources") or resource_data_str.startswith("No relevant"):
-        print(f"No data or no relevant details extracted to summarize for {category_name}. Skipping AI call.")
+        print(f"{TerminalColors.OKCYAN}No data or no relevant details extracted to summarize for {category_name}. Skipping AI call.{TerminalColors.ENDC}")
         # Return the message indicating why AI wasn't called, but not as an error
         return resource_data_str 
         
-    print(f"\nAttempting to get detailed Gemini summary for: {category_name}...")
+    print(f"{TerminalColors.OKBLUE}Attempting to get detailed Gemini summary for: {category_name}...{TerminalColors.ENDC}")
     try:
         # Configure the API key each time - harmless and ensures it's set
         genai.configure(api_key=gemini_api_key)
@@ -108,7 +120,7 @@ In-depth Analysis:"""
         
         # Check for response content and potential blocking
         if response and hasattr(response, 'text') and response.text:
-            print(f"Successfully received summary for {category_name}.")
+            print(f"{TerminalColors.OKGREEN}Successfully received summary for {category_name}.{TerminalColors.ENDC}")
             return response.text.strip()
         elif response and hasattr(response, 'prompt_feedback') and response.prompt_feedback:
              feedback = response.prompt_feedback
@@ -117,20 +129,20 @@ In-depth Analysis:"""
                  # Check if block_reason_message attribute exists (might not always)
                  if hasattr(feedback, 'block_reason_message') and feedback.block_reason_message:
                      block_reason_message += f" - {feedback.block_reason_message}"
-                 print(block_reason_message)
+                 print(f"{TerminalColors.WARNING}{block_reason_message}{TerminalColors.ENDC}")
                  return block_reason_message # Return the block reason as the summary
              else:
                  # If no block reason but still no text, it's an unexpected empty response
-                 print(f"Gemini API returned an empty response (no text, no block reason) for {category_name}.")
+                 print(f"{TerminalColors.WARNING}Gemini API returned an empty response (no text, no block reason) for {category_name}.{TerminalColors.ENDC}")
                  return f"Error: Gemini API returned an empty response for {category_name}."
         else:
             # Handle cases where response object itself might be malformed or None
-            print(f"Gemini API returned an unexpected or malformed response object for {category_name}: {response}")
+            print(f"{TerminalColors.FAIL}Gemini API returned an unexpected or malformed response object for {category_name}: {response}{TerminalColors.ENDC}")
             return f"Error: Gemini API returned an unexpected response for {category_name}."
             
     except Exception as e:
         # Catch potential errors during API configuration or the generate_content call
-        print(f"Error calling Gemini API for {category_name}: {type(e).__name__} - {e}")
+        print(f"{TerminalColors.FAIL}Error calling Gemini API for {category_name}: {type(e).__name__} - {e}{TerminalColors.ENDC}")
         # Check if the error object has specific details (like response for API errors)
         error_details = str(e)
         if hasattr(e, 'response') and e.response:
